@@ -11,7 +11,5 @@ jobs:
       - run:
           name: The First Step
           command: |
-            echo 'Hello World!'
-            sudo npm install newman
+            sudo npm install newman &
             newman run ProdAPITests.json
-            echo 'This is the delivery pipeline'
