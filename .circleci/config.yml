@@ -1,26 +1,11 @@
 
 version: 2.1
+orbs:
+  newman: postman/newman@0.0.2
 jobs:
-  shellcheck:
-    docker:
-      - image: alpine:3.7
-        auth:
-          username: 'cimg/python:3.9.0'
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+  newman-collection-run:
+    executor: newman/postman-newman-docker
     steps:
-      - run:
-          name: The First Step
-          command: |
-            sudo npm install newman &
-            newman run ProdAPITests.json
-workflows:
-  version: 2.1
-  check-build:
-    jobs:
-      - shellcheck
-      - The First Step:
-          requires:
-            - shellcheck
-          filters:
-            branches:
-              only: master
+      - checkout
+      - newman/newman-run:
+          collection: ./ProdAPITests.json
