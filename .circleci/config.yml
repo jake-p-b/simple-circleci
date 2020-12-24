@@ -3,8 +3,13 @@ jobs:
     executor: newman/postman-newman-docker
     steps:
       - checkout
-      - newman/newman-run: 
+      - newman/newman-run:
           collection: ./ProdAPITests.json
 orbs:
   newman: postman/newman@0.0.2
 version: 2.1
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - newman-collection-run
