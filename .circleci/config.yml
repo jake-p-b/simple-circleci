@@ -1,7 +1,7 @@
 
 version: 2.1
 jobs:
-  build:
+  shellcheck:
     docker:
       - image: alpine:3.7
         auth:
