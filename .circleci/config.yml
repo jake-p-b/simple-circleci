@@ -6,6 +6,7 @@ jobs:
   newman-collection-run:
     executor: newman/postman-newman-docker
     steps:
+      name: HI
       - checkout
       - newman/newman-run:
           collection: ./ProdAPITests.json
