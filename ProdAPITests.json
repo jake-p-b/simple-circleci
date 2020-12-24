@@ -1,0 +1,518 @@
+{
+	"info": {
+		"_postman_id": "e2c67cac-8ac9-4dd4-8800-03ca07706e3b",
+		"name": "Products  API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Basic test syntax",
+			"item": [],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "API tests",
+			"item": [
+				{
+					"name": "Search Store Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "208b79ab-f6f4-425c-b236-b9e10797e66f",
+								"exec": [
+									"pm.test(\"Showing from product and store\", function() {",
+									"    let jsonData = pm.response.json();",
+									"    var return_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)].name;",
+									"    var ret_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = ret_product.prod_url.match('^https://www\\.([a-zA-Z]+).+');",
+									"    var return_store = info[1];",
+									"",
+									"    let store = pm.environment.get(\"store\");",
+									"    let product = pm.environment.get(\"product\");",
+									"    ",
+									"    pm.expect(return_product).to.eql(product);",
+									"    pm.expect(return_store).to.eql(store);",
+									"})",
+									"",
+									"pm.test(\"Valid Prices\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    for(i = 0; i < jsonData.products.length; i++){",
+									"        pm.expect(jsonData.products[i].price).to.match(/^[0-9]*(\\.[0-9][0-9])?$/);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Valid Images and Product URLs\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    for(i = 0; i < jsonData.products.length; i++){",
+									"        pm.expect(jsonData.products[i].prod_url).to.match(/^https:\\/\\/www\\.makro\\.co\\.za(\\/[a-zA-Z0-9-_]+)*$/);",
+									"        pm.expect(jsonData.products[i].image_url).to.match(/^https:\\/\\/www\\.makro\\.co\\.za(\\/[a-zA-Z0-9-_]+)*$/);",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "94cca7f9-7330-463d-a59f-7d6a2c6bde23",
+								"exec": [
+									"pm.sendRequest({",
+									"    url: 'http://localhost:5000/store/product',",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"Department_Category\": \"\"})",
+									"    }",
+									"}, function (err, response) {",
+									"    var jsonData = response.json();",
+									"    var product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = product.prod_url.match('^https://www\\.([a-zA-Z]+).+');",
+									"    var store = info[1];",
+									"    console.log(\"Searching from store: \" + store + \" for prod: \" + product.name);",
+									"    pm.environment.set(\"store\", store);",
+									"    pm.environment.set(\"product\", product.name);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"Product\" : \"{{product}}\", \"Store\" : \"{{store}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Store",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "809790df-02e1-490c-99af-d048740b66a4",
+								"exec": [
+									"pm.sendRequest({",
+									"    url: 'http://localhost:5000/store/product',",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"Department_Category\": \"\"})",
+									"    }",
+									"}, function (err, response) {",
+									"    var jsonData = response.json();",
+									"    var product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = product.prod_url.match('^https://www\\.([a-zA-Z]+)\\.co\\.za\\/([a-zA-Z]+).*$');",
+									"    var store = info[1];",
+									"    ",
+									"    pm.environment.set(\"store\", store);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3509540f-26d9-4494-8aaf-330969604ddb",
+								"exec": [
+									"//does each product come from store",
+									"pm.test(\"Showing from Store\", function() {",
+									"    let jsonData = pm.response.json();",
+									"    var ret_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = ret_product.prod_url.match('^https://www\\.([a-zA-Z]+).+');",
+									"    var return_store = info[1];",
+									"",
+									"    let store = pm.environment.get(\"store\");",
+									"    ",
+									"    pm.expect(return_store).to.eql(store);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"Store\" : \"{{store}}\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Store Department Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "494c611b-3d0d-42e3-ac35-c4552ab88cc2",
+								"exec": [
+									"pm.test(\"Showing from product store department\", function() {",
+									"    let jsonData = pm.response.json();",
+									"    var return_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)].name;",
+									"    var ret_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = ret_product.prod_url.match('^https://www\\.([a-zA-Z]+)\\.co\\.za\\/([a-zA-Z]+).*$');",
+									"    var return_store = info[1];",
+									"    let return_department = info[2];",
+									"",
+									"    let store = pm.environment.get(\"store\");",
+									"    let product = pm.environment.get(\"product\");",
+									"    let department = pm.environment.get(\"department\");",
+									"    ",
+									"    pm.expect(return_product).to.eql(product);",
+									"    pm.expect(return_store).to.eql(store);",
+									"    pm.expect(return_department).to.eql(department);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e62dad43-b42e-43ce-a23d-42b6a7a8cf86",
+								"exec": [
+									"pm.sendRequest({",
+									"    url: 'http://localhost:5000/store/product',",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"Department_Category\": \"\"})",
+									"    }",
+									"}, function (err, response) {",
+									"    var jsonData = response.json();",
+									"    var product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = product.prod_url.match('^https://www\\.([a-zA-Z]+)\\.co\\.za\\/([a-zA-Z]+).*$');",
+									"    var store = info[1];",
+									"    let department = info[2];",
+									"    console.log(\"Searching from store: \" + store + \" from department: \" + department + \" for prod: \" + product.name);",
+									"    pm.environment.set(\"store\", store);",
+									"    pm.environment.set(\"product\", product.name);",
+									"    pm.environment.set(\"department\", department);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"Store\" : \"{{store}}\", \"Department\" : \"{{department}}\", \"Product\" : \"{{product}}\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "69ce4f62-b18d-477e-9c14-68d80a372573",
+								"exec": [
+									"pm.test(\"Showing product\", function() {",
+									"    let jsonData = pm.response.json();",
+									"    var return_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)].name;",
+									"",
+									"    let product = pm.environment.get(\"product\");",
+									"    ",
+									"    pm.expect(return_product).to.eql(product);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "19a312b7-26e2-4a0e-b0a3-ffef33f77cb0",
+								"exec": [
+									"pm.sendRequest({",
+									"    url: 'http://localhost:5000/store/product',",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"Department_Category\": \"\"})",
+									"    }",
+									"}, function (err, response) {",
+									"    var jsonData = response.json();",
+									"    var product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    ",
+									"    pm.environment.set(\"product\", product.name);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"Product\" : \"{{product}}\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Department",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1ae23690-bc67-468c-8992-65f680bd0148",
+								"exec": [
+									"pm.sendRequest({",
+									"    url: 'http://localhost:5000/store/product',",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"Department_Category\": \"\"})",
+									"    }",
+									"}, function (err, response) {",
+									"    var jsonData = response.json();",
+									"    var product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = product.prod_url.match('^https://www\\.([a-zA-Z]+)\\.co\\.za\\/([a-zA-Z]+).*$');",
+									"    let department = info[2];",
+									"    pm.environment.set(\"department\", department);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8cfef79d-b93e-40fb-b54a-8cfaef6cd43d",
+								"exec": [
+									"pm.test(\"Showing department, function() {",
+									"    let jsonData = pm.response.json();",
+									"    ",
+									"    var ret_product = jsonData.products[Math.floor(Math.random() * jsonData.products.length)];",
+									"    var info = ret_product.prod_url.match('^https://www\\.([a-zA-Z]+)\\.co\\.za\\/([a-zA-Z]+).*$');",
+									"",
+									"    let return_department = info[2];",
+									"",
+									"    let department = pm.environment.get(\"department\");",
+									"",
+									"    pm.expect(return_department).to.eql(department);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"Department\" : \"{{department}}\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Department_Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/store/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"store",
+								"product"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Integration Tests",
+			"item": [],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5634aa61-6717-4e52-8d12-7cf70eb29e97",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "073d99bc-bf7c-437d-a699-9a3364c0f053",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status Code is 200\", function () {",
+					"    pm.response.to.have.status(200);",
+					"})",
+					"",
+					"pm.test(\"Response time 200ms or less\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(201);",
+					"});",
+					"",
+					"pm.test(\"Response time 1500ms or less\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(1501);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "a5ad1fc5-58a6-4996-a9bc-e4f5c73a21af",
+			"key": "stores_str",
+			"value": "Makro"
+		},
+		{
+			"id": "c8eab16f-07fc-4118-881a-9b5fafa07054",
+			"key": "products_str",
+			"value": "AEG,KIC,Univa,Defy,Samsung,Bosch,Hisense,Whirlpool"
+		},
+		{
+			"id": "85b0fdfb-60ec-41d8-8c4f-629034e20ec4",
+			"key": "departments_str",
+			"value": "Appliances"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
