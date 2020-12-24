@@ -18,7 +18,7 @@ workflows:
   check-build:
     jobs:
       - shellcheck
-      - steps:
+      - The First Step:
           requires:
             - shellcheck
           filters:
