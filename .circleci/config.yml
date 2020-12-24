@@ -5,11 +5,22 @@ jobs:
     docker:
       - image: alpine:3.7
         auth:
-          username: "11772299"
-          password: no  # context / project UI env-var reference
+          username: 'cimg/python:3.9.0'
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
     steps:
       - run:
           name: The First Step
           command: |
             sudo npm install newman &
             newman run ProdAPITests.json
+workflows:
+  version: 2.1
+  check-build:
+    jobs:
+      - shellcheck
+      - build-job:
+          requires:
+            - shellcheck
+          filters:
+            branches:
+              only: master
