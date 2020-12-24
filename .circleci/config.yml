@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: alpine:3.7
         auth:
-          username: 11772299
+          username: "11772299"
           password: no  # context / project UI env-var reference
     steps:
       - run:
