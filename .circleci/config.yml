@@ -7,7 +7,7 @@ jobs:
           collection: ./ProdAPITests.json
 
 
-          
+
 orbs:
   newman: postman/newman@0.0.2
 version: 2.1
