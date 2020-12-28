@@ -5,13 +5,18 @@ jobs:
       - checkout
       - newman/newman-run:
           collection: ./ProdAPITests.json
-
-          
 orbs:
   newman: postman/newman@0.0.2
 version: 2.1
 workflows:
   version: 2
-  workflow:
+  build-test-and-approval-deploy:
     jobs:
       - newman-collection-run
+      - hold:
+        type: approval
+        requires:
+          - newman-collection-run
+      - deploy:
+        requires:
+          - hold
